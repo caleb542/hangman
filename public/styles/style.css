@@ -1,0 +1,197 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+html {
+    font-size:100%;
+}
+body {
+    background: #2B292E;
+    color: #fafafa;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding:6em;
+}
+header {
+    box-sizing: border-box;
+    margin:0 0 10rem 0;
+    padding:0.4rem 0 0.3rem 0;
+}
+#guessed header{
+    margin:0 0 1rem 0;
+}
+span {
+    border-bottom: 1px solid #534f59;
+    display: inline-block;
+    font-size: 2rem;
+    height: 2.4rem;
+    line-height: 2.4rem;
+    margin: 0 .1rem;
+    text-align: center;
+    text-transform: uppercase;
+    width: 2.4rem;
+}
+
+p {
+    font-weight: 300;
+    margin-bottom: .8rem;
+}
+
+.puzzle {
+    display: flex;
+    margin-bottom: 4.8rem;
+    flex-wrap: wrap;
+    white-space: break-spaces;
+    max-width: 500px;
+}
+.puzzle > div{
+    margin-right:2rem;    
+}
+.puzzle > div:last-child{
+    margin-right:0;
+}
+
+.button {
+    background: #7044a0;
+    border: none;
+    border-bottom: 2px solid #603a88;
+    cursor: pointer;
+    color: white;
+    font-size: 3rem;
+    font-weight: 300;
+    padding: .8rem;
+    transition: background .3s ease, color .3s ease;
+}
+
+.button:hover {
+    background: #5F3A87;
+}
+#guessed{
+    position: relative;
+    background:#27252c;
+    padding:0.4rem;
+    margin:2em 0;
+    min-height:8rem;
+    box-sizing: border-box;
+    color:#fff;
+}
+a.cross-out{
+    text-decoration:line-through !important;
+    opacity:0.3
+}
+
+#guessed .alphabet {
+    display: grid;
+    grid-template-columns: 2fr 2fr 2fr 2fr 2fr 2fr;
+    gap: 1em 1em;
+    grid-auto-flow: row;
+    grid-auto-columns: min-content;
+    position: relative;
+}
+
+.alphabet a{
+    border-bottom: 1px solid #534f59;
+    display: inline-block;
+    border-radius:6px;
+    font-size: 2rem;
+    height: 2.4rem;
+    line-height: 2.4rem;
+    margin: 0 .1rem;
+    text-align: center;
+    text-transform: uppercase;
+    width: 2.4rem;
+    width:auto;
+    height:auto;
+    padding:1.5rem;
+    text-decoration:none;
+    color:#fff;
+    
+}
+.alphabet a:focus, .alphabet a:hover{
+    outline:none;
+    background:#534f59;
+}
+footer {
+    display: grid;
+    grid-template-columns: 4fr 2fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 16px;
+    grid-row-gap: 0px;
+}
+@media screen and (min-device-width:979px){
+    html {
+        font-size: 62.5%;
+    }
+}
+@media screen and (min-device-width:320px) and (max-device-width:768px) and (orientation:portrait) {
+    body{
+        display: flex;
+        flex-direction: column;
+        justify-content: normal;
+        min-height: 100vh;
+        width: 100vw;
+        padding: 0;
+    }
+    .container {
+        width:100%;
+        height:100%;
+        overflow:hidden;
+        padding:3rem;
+    }
+    h1 {
+        font-size:3.4rem
+    }
+    .puzzle {
+        display: flex;
+        margin-bottom: 4.8rem;
+        flex-wrap: wrap;
+        white-space: break-spaces;
+        width: 100%;
+        max-width:100%;
+    }
+    .puzzle span{
+        border-bottom: 3px solid #534f59;
+        display: inline-block;
+        font-size: 3.2rem;
+        height: auto;
+        line-height: normal;
+        margin: 0;
+        padding-bottom: 0;
+        text-align: center;
+        text-transform: uppercase;
+        width: auto;
+        min-width: 3rem;
+    }
+    .puzzle > div{
+        margin-right:2rem;
+        margin-bottom:2rem;
+    }
+    #guessed .alphabet {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+        gap: 0em 0em;
+        grid-auto-flow: row;
+        grid-auto-columns: min-content;
+        position: relative;
+    }
+    .alphabet a{
+        border-bottom: 2px solid #534f59;
+        display: inline-block;
+        font-size: 3rem;
+        height: 2.4rem;
+        line-height: 2.4rem;
+        margin: 0 1rem;
+        text-align: center;
+        text-transform: uppercase;
+        width: 2.4rem;
+        width:auto;
+        height:auto;
+    }
+    
+
+}

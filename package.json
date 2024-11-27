@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^9.2.1",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "core-js": "^3.39.0",
+    "css-loader": "^7.1.2",
+    "live-server": "^1.2.2",
+    "postcss-loader": "^8.1.1",
+    "webpack": "^5.96.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
+  },
+  "name": "boilerplate",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev-server": "webpack-dev-server --mode development",
+    "build": "webpack --mode production"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "babel src/index.js -o public/scripts/bundle.js --presets env --watch ",
+  "devDependencies": {
+    "@babel/preset-env": "^7.26.0",
+    "babel-cli": "^6.26.0"
+  }
+}
