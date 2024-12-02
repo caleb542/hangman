@@ -1,1 +1,307 @@
-<!doctype html><html><head><title>Hangman App</title><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="/images/favicon.png" rel="icon"/><script defer="defer" src="bundle.js"></script></head><body><article><h1>Hangman App</h1><br><br><div class="puzzle" id="puzzle"></div><article id="guessed"><header>Available letters</header><div class="alphabet"><a href="#"><span>A</span></a> <a href="#"><span>B</span></a> <a href="#"><span>C</span></a> <a href="#"><span>D</span></a> <a href="#"><span>E</span></a> <a href="#"><span>F</span></a> <a href="#"><span>G</span></a> <a href="#"><span>H</span></a> <a href="#"><span>I</span></a> <a href="#"><span>J</span></a> <a href="#"><span>K</span></a> <a href="#"><span>L</span></a> <a href="#"><span>M</span></a> <a href="#"><span>N</span></a> <a href="#"><span>O</span></a> <a href="#"><span>P</span></a> <a href="#"><span>Q</span></a> <a href="#"><span>R</span></a> <a href="#"><span>S</span></a> <a href="#"><span>T</span></a> <a href="#"><span>U</span></a> <a href="#"><span>V</span></a> <a href="#"><span>W</span></a> <a href="#"><span>X</span></a> <a href="#"><span>Y</span></a> <a href="#"><span>Z</span></a></div></article><footer><div class="guesses-container"><p id="guesses"></p></div><div class="button-container"><button class="button" id="reset">Reset</button></div></footer></article></body></html>
+<!doctype html><html><head><title>Hangman App</title><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+html {
+    font-size:100%;
+}
+body{
+    --background-gradient:linear-gradient(180deg,#1f1f1f,#284c5a);
+    --cross-out:linear-gradient(-45deg, transparent 50%,#a50000 50%, transparent 51% ) no-repeat 0;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    background: #2B292E;
+    color:green;
+    color: #fafafa;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding:6em;
+}
+body > article {
+    max-width:380px;
+    width:100%;
+    border-radius: 12px;
+}
+body  > article  > *:not(h1){
+    border:1px solid #555;
+}
+body > article #guessed {
+    border-top:0;
+}
+body > article > footer {
+    border:0;
+}
+body > article > footer .guesses-container{
+    border:1px solid #555;
+    border-top:0;
+}
+header {
+    box-sizing: border-box;
+    margin:0;
+    padding:0rem 0rem 0;
+    text-transform: uppercase;
+    width:100%;
+    text-align: center;
+    align-content: center;
+}
+#guessed header{
+    margin:0;
+    height:50px;
+}
+.puzzle span {
+    border-bottom: 1px solid #534f59;
+    display: inline-block;
+    font-size: 2rem;
+    height: 2.4rem;
+    line-height: 2.4rem;
+    margin: 0 .1rem;
+    text-align: center;
+    text-transform: uppercase;
+    width: 2.4rem;
+}
+h1 {
+    width:100%;
+    text-align: center;
+    font-size:4rem;
+    font-weight: 800;
+    font-family:'montserrat';
+}
+h2 {
+    font-size:1.5rem;
+}
+p {
+    font-weight: 300;
+    margin:1rem 0;
+}
+
+.puzzle {
+    display: flex;
+    /* margin-bottom: 4.8rem; */
+    flex-wrap: wrap;
+    flex:1 1;
+    justify-content: center;
+    white-space: break-spaces;
+    max-width:380px;
+    background:#1f1f1f;
+    padding:30px 20px;
+}
+.puzzle > div{
+    margin-right:2rem;
+    margin-bottom:2rem;    
+}
+.puzzle > div:last-child{
+    margin-right:0;
+}
+
+
+#guessed{
+    position: relative;
+    /* background:#27252c; */
+    /* padding:0.4rem; */
+    /* margin:2em 0; */
+    min-height:8rem;
+    box-sizing: border-box;
+    color:#fff;
+    background:var(--background-gradient);
+}
+.alphabet a.cross-out{
+    /* text-decoration:line-through !important; */
+    color:rgba(255, 255, 255, 0.2);
+   
+    /* background-size:20% 20%;
+    background-size: 100%; */
+    overflow:hidden;
+    position:relative;
+}
+.alphabet a.cross-out::before{
+    content:'';
+    background:var(--cross-out);
+    background-position:bottom left;
+    animation:crossout .2s ease-out forwards;
+    position:absolute;
+    width:100%;
+    height:100%;
+    left:0;
+    bottom:0;
+    transform:scale(80%);
+    z-index:0;
+}
+
+@keyframes crossout {
+   
+
+    0%  {
+        clip-path: polygon(0 50%, 0% 100%, 100% 100%, 0% 100%);
+     
+    }
+    100% {
+        clip-path: polygon(0 50%, 100% 0%, 100% 100%, 0% 100%);
+        }
+}
+#guessed .alphabet {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-auto-flow: row;
+    grid-auto-columns: min-content;
+    position: relative;
+}
+
+.guesses-container {
+    box-sizing:border-box;
+    background:#1f1f1f;
+    
+    padding:10px 30px;
+}
+.button-container{
+    width:100%;
+    padding:0rem;
+    display:flex;
+    flex-direction: row-reverse;
+}
+.button {
+    background: turquoise;
+    border: none;
+    box-shadow:inset -2px -2px 3px rgba(255,255,255,1),inset 2px 2px 2px rgba(0,0,0,1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-radius:6px;
+    cursor: pointer;
+    color: #333;
+    font-size: 2rem;
+    padding: 8px 24px;
+    transition: scale .4s;
+    transform:scale(1);
+} 
+
+.button:hover {
+   opacity:0.8;
+}
+.button:focus-visible {
+    transform:scale(0.94);
+}
+
+footer {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:20px;
+    font-size:2rem;
+}
+
+footer span {
+    font-size:2rem;
+}
+.alphabet a{
+    border: 1px solid #534f59;
+    border-right:0px;
+    border-bottom:0px;
+    display: inline-block;
+    /* border-radius:6px; */
+    font-size: 2rem;
+    height: 2.4rem;
+    line-height: 2.4rem;
+    /* margin: 0 .1rem; */
+    text-align: center;
+    text-transform: uppercase;
+    width: calc(100%);
+    aspect-ratio: 1/1;
+    height:auto;
+    padding:1.5rem;
+    text-decoration:none;
+    color:#fff;
+    /* background:radial-gradient(#111 40%, transparent); */
+    background-size:200%;
+    background-position: top left;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.alphabet a:nth-of-type(26),
+.alphabet a:nth-of-type(25),
+.alphabet a:nth-of-type(24),
+.alphabet a:nth-of-type(23),
+.alphabet a:nth-of-type(22),
+.alphabet a:nth-of-type(21){
+    border-bottom:1px solid #534f59;
+}
+.alphabet a:nth-of-type(6n),
+.alphabet a:nth-of-type(26){
+    border-right:1px solid #534f59;
+}
+.alphabet a:hover{
+    outline:none;
+    background:#534f59;
+}
+.alphabet a:focus {
+    background:var(--cross-out);
+    background-size:50% 0;
+}
+@media screen and (min-device-width:979px){
+    html {
+        font-size: 62.5%;
+    }
+}
+@media screen and (min-device-width:320px) and (max-device-width:768px) and (orientation:portrait) {
+    body{
+        display: flex;
+        flex-direction: column;
+        justify-content: normal;
+        min-height: 100vh;
+        width: 100vw;
+    }
+    h1 {
+        font-size:3.4rem;
+        width:100%;
+        text-align: center;
+    }
+    .puzzle {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 4.8rem;
+        flex-wrap: wrap;
+        width: 100%;
+        min-height:150px;
+    }
+    .puzzle span{
+        font-size:5rem;
+        margin:1rem 0.3rem;
+    }
+    .puzzle > div{
+        margin:0 2rem 2rem 0;    
+    }
+    .puzzle > div:last-child{
+        margin-right:0rem;    
+    }
+    .alphabet{
+        border-bottom: 1px solid #534f59;
+        display: inline-block;
+        font-size: 3rem;
+        height: 2.4rem;
+        line-height: 3.4rem;
+        box-sizing: content-box;
+        text-align: center;
+        text-transform: uppercase;
+        width: 2.4rem;
+        width: auto;
+        height: auto;
+    }
+    .alphabet a{
+        border: 1px solid #534f59;
+        display: inline-block;
+        font-size: 3rem;
+        height: 2.4rem;
+        line-height: 2.4rem;
+        margin: 0 .1rem;
+        text-align: center;
+        text-transform: uppercase;
+        width: 2.4rem;
+        width:auto;
+        height:auto;
+    }
+    
+
+}</style><link href="/images/favicon.png" rel="icon"/><script defer="defer" src="bundle.js"></script></head><body><article><h1>Hangman App</h1><br><br><div class="puzzle" id="puzzle"><div style="width:100%;min-height:150px;display:grid;place-content: center;"><p>LOADING WORD PUZZLE...</p></div></div><article id="guessed"><header>Available letters</header><div class="alphabet"><a href="#"><span>A</span></a> <a href="#"><span>B</span></a> <a href="#"><span>C</span></a> <a href="#"><span>D</span></a> <a href="#"><span>E</span></a> <a href="#"><span>F</span></a> <a href="#"><span>G</span></a> <a href="#"><span>H</span></a> <a href="#"><span>I</span></a> <a href="#"><span>J</span></a> <a href="#"><span>K</span></a> <a href="#"><span>L</span></a> <a href="#"><span>M</span></a> <a href="#"><span>N</span></a> <a href="#"><span>O</span></a> <a href="#"><span>P</span></a> <a href="#"><span>Q</span></a> <a href="#"><span>R</span></a> <a href="#"><span>S</span></a> <a href="#"><span>T</span></a> <a href="#"><span>U</span></a> <a href="#"><span>V</span></a> <a href="#"><span>W</span></a> <a href="#"><span>X</span></a> <a href="#"><span>Y</span></a> <a href="#"><span>Z</span></a></div></article><footer><div class="guesses-container"><p id="guesses"></p></div><div class="button-container"><button class="button" id="reset">Reset</button></div></footer></article></body></html>
