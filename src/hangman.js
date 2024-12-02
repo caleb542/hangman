@@ -25,7 +25,20 @@ class Hangman {
     }
     get statusMessage() {
         if (this.status === 'playing') {
-            return `Guesses left: ${this.remainingGuesses}`
+            
+            let color;
+                if (this.remainingGuesses > 4){
+                    color = 'lightgreen'
+                }
+                if (this.remainingGuesses < 2) {
+                    color = 'red'
+                }
+                if (this.remainingGuesses >= 2 && this.remainingGuesses <=4){
+                    color='yellow'
+                }
+        
+        return `<span style="color:${color}">${ this.remainingGuesses } ${this.remainingGuesses === 1 ? 'guess':'guesses '} remaining</span>`
+        
         } else if (this.status === 'failed') {
             return `Nice try, but the correct phrase is "${this.word.join('')}".`
         } else {

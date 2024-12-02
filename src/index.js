@@ -1,5 +1,6 @@
 import Hangman from './hangman';
 import getPuzzle from './requests';
+import './styles/style.css'
 
 
 if (window.NodeList && !NodeList.prototype.forEach) { // polyfill for 'forEach' on IE11
@@ -49,7 +50,7 @@ const render = () => {
             })
             puzzleEl.appendChild(wordEl)
         });
-    guessesEl.textContent = game1.statusMessage
+    guessesEl.innerHTML = game1.statusMessage
 }
 const startGame = async () => {
     const puzzle = await getPuzzle('4')

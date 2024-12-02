@@ -4,22 +4,19 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: ['babel-polyfill','./src/index.js'],
+    entry: ['babel-polyfill','src/index.js'],
     output: {
         path: path.resolve(__dirname,'public'),
         filename: 'bundle.js',
         clean: true,
     },
-    
-    plugins: [ 
+    plugins: [ new HtmlWebpackPlugin({
+        title: 'Webpack App',
 
-        new HtmlWebpackPlugin({
-            title: 'Hangman App',
-            filename: 'index.html',
-            template: 'src/index.html' 
+        template: './src/index.html' 
     }) ],
     module: {
-       rules: [
+        rules: [
             { 
                 test: /\.css$/, 
                 use: [
@@ -40,14 +37,5 @@ module.exports = {
                 }
             }
         ]
-    },
-    devServer: {
-        static: path.resolve(__dirname, 'public'),
-        hot: true, 
-        watchFiles: ['src/*.html', 'src/*.css'],
-    },
-    devtool: 'source-map'
-}
-    
-
-
+    }
+};
