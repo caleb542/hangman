@@ -18,7 +18,7 @@
     "clean": "rm -rf node_modules",
     "install": "npm install"
   },
-  "author": "",
+  "author": "Caleb Hamilton",
   "license": "ISC",
   "description": "babel src/index.js -o public/scripts/bundle.js --presets env --watch ",
   "devDependencies": {
