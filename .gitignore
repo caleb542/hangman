@@ -3,3 +3,6 @@ pLublic
 webpack.common.js
 webpack.dev.js
 webpack.prod.js
+.env
+# Local Netlify folder
+.netlify

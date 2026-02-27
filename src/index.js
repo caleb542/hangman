@@ -1,5 +1,6 @@
 import Hangman from './hangman'
 import getPuzzle from './requests'
+import { initLeaderboard, selectPlayer, submitGameScore, showLeaderboard } from './leaderboard'
 import './styles/style.css'
 
 // ── CONSTANTS ─────────────────────────────────────────────────────────────
@@ -14,16 +15,21 @@ const KEY_ROWS = [
 // ── STATE ─────────────────────────────────────────────────────────────────
 let game
 let score = 0
+let currentPlayer = null
 let bestScore = parseInt(localStorage.getItem('hm_best') || '0')
 
 // ── DOM REFS ──────────────────────────────────────────────────────────────
-const boardEl   = document.getElementById('board')
+const boardEl    = document.getElementById('board')
 const keyboardEl = document.getElementById('keyboard')
-const statusEl  = document.getElementById('status')
-const hpFill    = document.getElementById('hp-fill')
-const hpCount   = document.getElementById('hp-count')
-const scoreEl   = document.getElementById('score')
-const bestEl    = document.getElementById('best')
+const statusEl   = document.getElementById('status')
+const hpFill     = document.getElementById('hp-fill')
+const hpCount    = document.getElementById('hp-count')
+const scoreEl    = document.getElementById('score')
+const bestEl     = document.getElementById('best')
+const headerEl   = document.querySelector('.game-header')
+
+// ── INIT LEADERBOARD ──────────────────────────────────────────────────────
+initLeaderboard(headerEl)
 
 // ── BUILD KEYBOARD ────────────────────────────────────────────────────────
 KEY_ROWS.forEach(row => {
@@ -149,7 +155,6 @@ function handleGuess(letter) {
         updateHP()
         key?.classList.add('wrong')
 
-        // Screen shake on low HP
         if (game.remainingGuesses <= 2) {
             document.body.classList.add('shake')
             setTimeout(() => document.body.classList.remove('shake'), 300)
@@ -166,10 +171,31 @@ function handleGuess(letter) {
     if (game.status === 'finished') {
         score += game.remainingGuesses * 10
         updateScore()
-        setTimeout(revealAll, 200)
+        setTimeout(() => {
+            revealAll()
+            endGame(true)
+        }, 400)
     } else if (game.status === 'failed') {
-        setTimeout(revealAll, 400)
+        setTimeout(() => {
+            revealAll()
+            endGame(false)
+        }, 600)
     }
+}
+
+// ── END GAME ──────────────────────────────────────────────────────────────
+async function endGame(won) {
+    if (!currentPlayer) return
+
+    await submitGameScore(
+        currentPlayer,
+        game.word.join(''),
+        score,
+        won,
+        game.remainingGuesses
+    )
+
+    setTimeout(() => showLeaderboard(), 800)
 }
 
 // ── KEYBOARD HANDLER ──────────────────────────────────────────────────────
@@ -180,6 +206,8 @@ window.addEventListener('keypress', (e) => {
 
 // ── START GAME ────────────────────────────────────────────────────────────
 const startGame = async () => {
+    currentPlayer = await selectPlayer()
+
     score = 0
     updateScore()
 
@@ -187,7 +215,6 @@ const startGame = async () => {
     statusEl.className = 'status-message'
     statusEl.textContent = ''
 
-    // Reset keys
     document.querySelectorAll('.key').forEach(k => k.className = 'key')
 
     const puzzle = await getPuzzle('4')
