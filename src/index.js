@@ -1,67 +1,203 @@
-import Hangman from './hangman';
-import getPuzzle from './requests';
+import Hangman from './hangman'
+import getPuzzle from './requests'
 import './styles/style.css'
 
+// ── CONSTANTS ─────────────────────────────────────────────────────────────
+const MAX_GUESSES = 5
+const KEY_ROWS = [
+    ['A','B','C','D','E','F','G'],
+    ['H','I','J','K','L','M','N'],
+    ['O','P','Q','R','S','T','U'],
+    ['V','W','X','Y','Z']
+]
 
-if (window.NodeList && !NodeList.prototype.forEach) { // polyfill for 'forEach' on IE11
-    NodeList.prototype.forEach = Array.prototype.forEach;
-}
+// ── STATE ─────────────────────────────────────────────────────────────────
+let game
+let score = 0
+let bestScore = parseInt(localStorage.getItem('hm_best') || '0')
 
-const puzzleEl = document.querySelector('#puzzle')
-const guessesEl = document.querySelector('#guesses')
-let game1
+// ── DOM REFS ──────────────────────────────────────────────────────────────
+const boardEl   = document.getElementById('board')
+const keyboardEl = document.getElementById('keyboard')
+const statusEl  = document.getElementById('status')
+const hpFill    = document.getElementById('hp-fill')
+const hpCount   = document.getElementById('hp-count')
+const scoreEl   = document.getElementById('score')
+const bestEl    = document.getElementById('best')
 
-window.addEventListener('keypress', (e) => {
-    const guess = String.fromCharCode(e.charCode)
-    game1.makeGuess(guess)
-    render()
-})
-let spans = document.querySelectorAll("#guessed .alphabet a");
-spans.forEach(span => {
-    span.addEventListener('click', (e) => {
-        e.preventDefault()
-       const guess = e.target.textContent
-       // console.(e.target.textContent)
-       game1.makeGuess(guess)
-       render()
+// ── BUILD KEYBOARD ────────────────────────────────────────────────────────
+KEY_ROWS.forEach(row => {
+    const rowEl = document.createElement('div')
+    rowEl.className = 'key-row'
+
+    row.forEach(letter => {
+        const key = document.createElement('button')
+        key.className = 'key'
+        key.textContent = letter
+        key.dataset.letter = letter
+        key.setAttribute('aria-label', `Letter ${letter}`)
+        key.addEventListener('click', () => handleGuess(letter))
+        rowEl.appendChild(key)
     })
+
+    keyboardEl.appendChild(rowEl)
 })
-const render = () => {
-    puzzleEl.innerHTML = ''
-    
-        game1.puzzle.split(' ').forEach(word => {
-            const wordEl = document.createElement('div')
-            // Issue: Every time the puzzle is generated the width of the puzzle is determined
-            // by the size of the word.  The effect is that the whole puzzle changes width at every
-            // reset.  This is not appealing, so some decisions needed to be made.
 
-            // To control the width of the puzzle, word wrapping needs to be possible,
-            // and it was, but With each letter wrapped in a span, it meant letters do the 
-            // wrapping, not the words.  We need word wrap, not letter wrap.
-            // So each word must be contained.
+// ── BUILD BOARD ───────────────────────────────────────────────────────────
+function buildBoard(phrase) {
+    boardEl.innerHTML = ''
 
-            // The following technique ensures each word in the phrase gets wrapped
-            // inside a div, while allowing each of the letters to remain inside a span.
-            word.split('').forEach((letter) => {
-                const letterEl = document.createElement('span')
-                letterEl.textContent = letter
-                wordEl.appendChild(letterEl)
+    phrase.split(' ').forEach(word => {
+        const rowEl = document.createElement('div')
+        rowEl.className = 'word-row'
 
-            })
-            puzzleEl.appendChild(wordEl)
-        });
-    guessesEl.innerHTML = game1.statusMessage
+        ;[...word.toUpperCase()].forEach(char => {
+            const wrap = document.createElement('div')
+            wrap.className = 'tile-wrap'
+
+            const tile = document.createElement('div')
+            tile.className = 'tile'
+            tile.dataset.char = char
+
+            tile.innerHTML = `
+                <div class="tile-front"></div>
+                <div class="tile-back"><span class="letter">${char}</span></div>
+            `
+
+            wrap.appendChild(tile)
+            rowEl.appendChild(wrap)
+        })
+
+        boardEl.appendChild(rowEl)
+    })
 }
+
+// ── REVEAL TILES ──────────────────────────────────────────────────────────
+function revealLetter(letter) {
+    const tiles = boardEl.querySelectorAll(`.tile[data-char="${letter.toUpperCase()}"]`)
+    tiles.forEach((tile, i) => {
+        setTimeout(() => tile.classList.add('flipped'), i * 100)
+    })
+    return tiles.length
+}
+
+function revealAll() {
+    const tiles = boardEl.querySelectorAll('.tile:not(.flipped)')
+    tiles.forEach((tile, i) => {
+        setTimeout(() => tile.classList.add('flipped'), i * 60)
+    })
+}
+
+// ── HP ────────────────────────────────────────────────────────────────────
+function updateHP() {
+    const pct = (game.remainingGuesses / MAX_GUESSES) * 100
+
+    hpFill.style.width = pct + '%'
+    hpFill.className = 'hp-fill'
+    hpCount.className = 'hp-count'
+    hpCount.textContent = `${game.remainingGuesses} / ${MAX_GUESSES}`
+
+    if (pct <= 33) {
+        hpFill.classList.add('low')
+        hpCount.classList.add('low')
+    } else if (pct <= 66) {
+        hpFill.classList.add('mid')
+        hpCount.classList.add('mid')
+    }
+}
+
+// ── SCORE ─────────────────────────────────────────────────────────────────
+function updateScore() {
+    scoreEl.textContent = score
+    if (score > bestScore) {
+        bestScore = score
+        localStorage.setItem('hm_best', bestScore)
+    }
+    bestEl.textContent = bestScore
+}
+
+// ── STATUS ────────────────────────────────────────────────────────────────
+function updateStatus() {
+    statusEl.className = 'status-message'
+
+    if (game.status === 'playing') {
+        statusEl.textContent = ''
+    } else if (game.status === 'finished') {
+        statusEl.classList.add('win')
+        statusEl.textContent = `Solved! +${game.remainingGuesses * 10} bonus`
+    } else if (game.status === 'failed') {
+        statusEl.classList.add('lose')
+        statusEl.textContent = `The phrase was: "${game.word.join('')}"`
+    }
+}
+
+// ── HANDLE GUESS ──────────────────────────────────────────────────────────
+function handleGuess(letter) {
+    if (game.status !== 'playing') return
+
+    const result = game.makeGuess(letter)
+    if (!result || !result.isUnique) return
+
+    const key = document.querySelector(`.key[data-letter="${letter.toUpperCase()}"]`)
+
+    if (result.isCorrect) {
+        const count = revealLetter(letter)
+        score += count * 5
+        updateScore()
+        key?.classList.add('correct')
+    } else {
+        updateHP()
+        key?.classList.add('wrong')
+
+        // Screen shake on low HP
+        if (game.remainingGuesses <= 2) {
+            document.body.classList.add('shake')
+            setTimeout(() => document.body.classList.remove('shake'), 300)
+        }
+    }
+
+    setTimeout(() => {
+        key?.classList.remove('correct', 'wrong')
+        key?.classList.add('used')
+    }, 560)
+
+    updateStatus()
+
+    if (game.status === 'finished') {
+        score += game.remainingGuesses * 10
+        updateScore()
+        setTimeout(revealAll, 200)
+    } else if (game.status === 'failed') {
+        setTimeout(revealAll, 400)
+    }
+}
+
+// ── KEYBOARD HANDLER ──────────────────────────────────────────────────────
+window.addEventListener('keypress', (e) => {
+    const letter = String.fromCharCode(e.charCode)
+    if (/^[a-zA-Z]$/.test(letter)) handleGuess(letter.toUpperCase())
+})
+
+// ── START GAME ────────────────────────────────────────────────────────────
 const startGame = async () => {
+    score = 0
+    updateScore()
+
+    boardEl.innerHTML = '<div class="board-loading">Loading puzzle...</div>'
+    statusEl.className = 'status-message'
+    statusEl.textContent = ''
+
+    // Reset keys
+    document.querySelectorAll('.key').forEach(k => k.className = 'key')
+
     const puzzle = await getPuzzle('4')
-    let spans = document.querySelectorAll("#guessed .alphabet a")
-    spans.forEach((span) => {span.classList.remove("cross-out")})
-    game1 = new Hangman(puzzle, 5)
-    render()
+    game = new Hangman(puzzle, MAX_GUESSES)
+
+    buildBoard(puzzle)
+    updateHP()
 }
 
-
+// ── INIT ──────────────────────────────────────────────────────────────────
+bestEl.textContent = bestScore
+document.getElementById('reset').addEventListener('click', startGame)
 startGame()
-
-document.querySelector('#reset').addEventListener('click', startGame)
-
