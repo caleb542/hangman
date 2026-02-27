@@ -5,9 +5,7 @@ const HEADERS = {
 }
 
 exports.handler = async (event) => {
-      console.log('BIN_ID:', process.env.JSONBIN_BIN_ID)
-    console.log('KEY exists:', !!process.env.JSONBIN_API_KEY)
-console.log("./netlify/func/leaderboard.JS: running handler")
+
     // GET — fetch leaderboard
     if (event.httpMethod === 'GET') {
         try {
@@ -28,12 +26,10 @@ console.log("./netlify/func/leaderboard.JS: running handler")
              // Fetch current data first
             const newEntry = JSON.parse(event.body)
 
-        console.log('New entry:', newEntry)
-
         const getResponse = await fetch(JSONBIN_URL, { headers: HEADERS })
-        console.log('GET status:', getResponse.status)
+       
         const text = await getResponse.text()
-        console.log('GET response:', text)
+      
         const getData = JSON.parse(text)
         const current = getData.record
 
