@@ -139,6 +139,9 @@ function updateStatus() {
 
 // ── HANDLE GUESS ──────────────────────────────────────────────────────────
 function handleGuess(letter) {
+     // If the game failed to load, don't try to process guesses
+    if (!game) return; 
+
     if (game.status !== 'playing') return
 
     const result = game.makeGuess(letter)
@@ -217,7 +220,7 @@ const startGame = async () => {
 
     document.querySelectorAll('.key').forEach(k => k.className = 'key')
 
-    const puzzle = await getPuzzle('4')
+    const puzzle = await getPuzzle('4');
     game = new Hangman(puzzle, MAX_GUESSES)
 
     buildBoard(puzzle)
@@ -225,6 +228,9 @@ const startGame = async () => {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  document.body.style.visibility = 'visible';
+});
 bestEl.textContent = bestScore
 document.getElementById('reset').addEventListener('click', startGame)
 startGame()
