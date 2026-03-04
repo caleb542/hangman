@@ -1,3 +1,4 @@
+// /src/reuests.js
 // ── FALLBACK PUZZLES ──────────────────────────────────────────────────────
 // 464 curated Wheel of Fortune-style phrases (3–5 words, no apostrophes)
 const fallbackPuzzles = [
@@ -521,9 +522,10 @@ const getNextFallback = () => {
 }
 
 // ── GET PUZZLE ────────────────────────────────────────────────────────────
-const getPuzzle = async (wordCount) => {
+const getPuzzle = async (wordCount = 4) => {
     try {
-        const response = await fetch(`https://puzzle.mead.io/puzzle?wordCount=${wordCount}`)
+    
+        const response = await fetch(`/.netlify/functions/getPuzzle?wordCount=${wordCount}`)
         if (response.status === 200) {
             const data = await response.json()
             return data.puzzle
